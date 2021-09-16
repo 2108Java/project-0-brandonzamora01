@@ -4,21 +4,30 @@ import com.revature.models.User;
 
 public interface BankAppDAO {
 	
-	boolean registerAcct();
+	//SELECT
 	
-	boolean userLogin();
+	User selectAcctBal(String name);
 	
-	int viewAcctBal();
+	int employeeViewBalance();
+	
+	boolean userLogin(String name, String pw);
+	
+	//UPDATE
 	
 	boolean userWithdraw();
 	
 	boolean userDeposit();
 	
-	//boolean systemRejectTrans();
-	
-	int employeeViewBalance();
-	
 	boolean customerPostTransfer();
 	
 	boolean customerAcceptTransfer();
+	
+	//DELETE
+	
+	//INSERT
+	
+	boolean registerAcct(User newUser);
+	
+	//boolean systemRejectTrans();
+	
 }

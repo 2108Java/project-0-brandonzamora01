@@ -10,11 +10,12 @@ public class User {
 	private boolean isEmployee;
 	
 	
-	public User(String userName, String passWord, int checkingBalance, boolean isApproved, boolean isEmployee) {
+	public User(String userName, String passWord, int checkingBalance, int savingBalance, boolean isApproved, boolean isEmployee) {
 		super();
 		this.userName = userName;
 		this.passWord = passWord;
 		this.checkingBalance = checkingBalance;
+		this.savingBalance = savingBalance;
 		this.isApproved = isApproved;
 		this.isEmployee = isEmployee;
 	}
