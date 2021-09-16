@@ -31,8 +31,8 @@ public class MenuV1 implements Menu {
 	}
 	
 	private void customerMenu() {
-		System.out.println("***CUSTOMER MENU***");
-		System.out.println("Logged in as 'USER'");
+		System.out.println("\n***CUSTOMER MENU***");
+		System.out.println("Logged in as " + currentUser.getUserName());
 		System.out.println("1) View Account Balance");
 		System.out.println("2) Make Withdrawal");
 		System.out.println("3) Make Deposit");
@@ -44,8 +44,8 @@ public class MenuV1 implements Menu {
 	
 	private void employeeMenu() {
 		System.out.println("***EMPLOYEE MENU***");
-		System.out.println("Logged in as 'USER'");
-		System.out.println("1) View Customer Account Balance");
+		System.out.println("Logged in as "+ currentUser.getUserName());
+		System.out.println("\n1) View Customer Account Balance");
 		System.out.println("2) Approve Account Registration");
 		System.out.println("3) View Transaction Logs");
 		System.out.println("4) Navigate to Customer Menu");
@@ -77,10 +77,10 @@ public class MenuV1 implements Menu {
 			
 			switch(result){
 			case "1":
-				System.out.println("\nLogin as Customer: ");
-				System.out.print(" Please Enter Username: ");
+				System.out.println("\nLogin as Customer");
+				System.out.print("\nEnter Username: ");
 				String name = scanner.nextLine();
-				System.out.print(" Please Enter Password: ");
+				System.out.print("Enter Password: ");
 				String pw = scanner.nextLine();
 				
 				if (service.isAccount(name, pw)) {
@@ -119,14 +119,10 @@ public class MenuV1 implements Menu {
 			switch(result){
 			case "1":
 					//ToDoItem[] items = service.getAllToDos();
-					System.out.println("\nLogged in as 'USER'");
-					int balance = 0;
-					balance = currentUser.getCheckingBalance();
-					System.out.println(balance);
+					System.out.println("Your balances are:");
 					//prettyDisplayOfArray(items);
-					System.out.println("Checkings Balance: " + currentUser.getCheckingBalance());
+					System.out.println("\nCheckings Balance: " + currentUser.getCheckingBalance());
 					System.out.println("Savings Balance: " + currentUser.getSavingBalance());
-					System.out.println("");
 
 				//}catch(BusinessException e) {
 					//System.out.println("Our database is down!");
