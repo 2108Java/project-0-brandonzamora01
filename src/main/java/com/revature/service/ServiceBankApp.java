@@ -6,6 +6,9 @@ public interface ServiceBankApp {
 
 	public boolean isAccount(String name, String pw);
 
-	public User getAcctBal(String name);
+	public User getAcctByName(String name);
+
+	public boolean createAcct(User currentUser);
+	
 	
 }

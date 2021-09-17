@@ -16,10 +16,9 @@ public class MainDriver {
 		BankAppDAO database = new BankAppDAOImpl();
 		
 		//User bob = new User("Bob", "Password1", 100, true, false);
-		//User newUser = new User("Tim", "Password3", 200, 1000, true, false);
+		//User newUser = new User("Main", "password", 200, 1000, true, true);
 		
 		//database.registerAcct(newUser);
-		
 		ServiceBankApp service = new ServiceBankAppImpl(database);
 		
 		Menu mainMenu = new MenuV1(service);

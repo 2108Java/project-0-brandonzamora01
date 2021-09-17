@@ -6,11 +6,11 @@ public interface BankAppDAO {
 	
 	//SELECT
 	
-	User selectAcctBal(String name);
-	
-	int employeeViewBalance();
+	User selectAcctByName(String name);
 	
 	boolean userLogin(String name, String pw);
+	
+	boolean employeeLogin(String name, String pw);
 	
 	//UPDATE
 	
@@ -27,7 +27,7 @@ public interface BankAppDAO {
 	//INSERT
 	
 	boolean registerAcct(User newUser);
-	
+
 	//boolean systemRejectTrans();
 	
 }

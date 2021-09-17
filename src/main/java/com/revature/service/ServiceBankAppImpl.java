@@ -12,9 +12,8 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		this.database = database;
 	}
 	
-	public User getAcctBal(String user) {	
-		
-		return database.selectAcctBal(user);
+	public User getAcctByName(String user) {	
+		return database.selectAcctByName(user);
 	}
 	
 	public boolean isAccount(String name, String password) {
@@ -25,5 +24,12 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		return correctInfo;
 	}
 	
+	public boolean createAcct(User name) {
+		boolean createSuccessful = false;
+		
+		createSuccessful = database.registerAcct(name);
+		
+		return createSuccessful;
+	}
 }
 

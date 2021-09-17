@@ -74,9 +74,32 @@ public class BankAppDAOImpl implements BankAppDAO {
 	}
 
 	@Override
-	public User selectAcctBal(String name) {
-		// TODO Auto-generated method stub
+	public boolean employeeLogin(String name, String pw) {
 		boolean success = false;
+		//1. Connect to database!
+		try(Connection connection = DriverManager.getConnection(url,username,password)){
+			String sql = "SELECT * FROM all_users_table WHERE username = ?";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setString(1, name);
+			
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			String check = rs.getString("password");
+			boolean verifyEmployee = rs.getBoolean("isemployed");
+			
+			//System.out.println(check);
+			if (pw.equals(check) && verifyEmployee) {
+				success = true;
+				System.out.println("\nEmployee Login Successful!");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return success;
+	}
+	@Override
+	public User selectAcctByName(String name) {
+		//boolean success = false;
 		User acct = new User();
 		
 		try(Connection connection = DriverManager.getConnection(url,username,password)){
@@ -113,12 +136,6 @@ public class BankAppDAOImpl implements BankAppDAO {
 	public boolean userDeposit() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	@Override
-	public int employeeViewBalance() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override

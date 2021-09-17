@@ -20,6 +20,16 @@ public class User {
 		this.isEmployee = isEmployee;
 	}
 	
+	public User(String userName, String passWord) {
+		super();
+		this.userName = userName;
+		this.passWord = passWord;
+		this.checkingBalance = 0;
+		this.savingBalance = 0;
+		this.isApproved = false;
+		this.isEmployee = false;
+	}
+	
 	public User() {
 		super();
 	}
