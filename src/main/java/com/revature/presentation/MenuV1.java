@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 //import com.revature.exceptions.BusinessException;
 import com.revature.service.ServiceBankApp;
+import com.revature.models.Transaction;
 import com.revature.models.User;
 
 public class MenuV1 implements Menu {
@@ -83,7 +84,7 @@ public class MenuV1 implements Menu {
 				System.out.print("Enter Password: ");
 				String pw = scanner.nextLine();
 				
-				if (service.isAccount(name, pw)) {
+				if (service.isUserAccount(name, pw)) {
 					currentUser = service.getAcctByName(name);
 					customerDisplay();
 				}else {
@@ -97,17 +98,12 @@ public class MenuV1 implements Menu {
 				System.out.print("Enter Password: ");
 				String employeePw = scanner.nextLine();
 				
-				if (service.isAccount(employeeName, employeePw)) {
+				if (service.isEmployeeAccount(employeeName, employeePw)) {
 					currentUser = service.getAcctByName(employeeName);
-					if(currentUser.getIsEmployee()) {
-						employeeDisplay();
+					employeeDisplay();
 					}else {
 						System.out.println("Current User Is Not An Authorized Employee");
 					}
-					
-				}else {
-					System.out.println("Login Has Failed");
-				}
 				break;
 			case "3":
 				System.out.println("\nRegister New Customer Account\n");
@@ -135,6 +131,26 @@ public class MenuV1 implements Menu {
 				System.out.println("\nAccount Creation Successful. Please Login to Access Features");
 				running = false;
 				break;
+			case "4":
+				System.out.println("\nPost Money Transfer\n");
+				System.out.println("\nSelect Account To Transfer From");
+				System.out.println("1) Checkings");
+				System.out.println("2) Savings");
+				String selectAcct = scanner.nextLine();
+				if (selectAcct.equals("1")){
+					String sendType = new String("checking");
+					System.out.println("\nTransfering From Your Checking Account");
+					System.out.println("Available Balance: " + currentUser.getCheckingBalance());
+					System.out.println("Please Enter The Username The Will Recieve The Transfer:\n");
+					String sendTo = scanner.nextLine();
+					System.out.println("Please Enter The Account Type Of The Reciever (checkings or savings):\n");
+					String recType = scanner.nextLine();
+					System.out.println("Please Enter The Amount Being Transfered:\n");
+					int sendAmount = Integer.parseInt(scanner.nextLine());
+					System.out.println("\nSummary: Sending $"+sendAmount+"To "+sendTo+"'s"+recType+" Account.");
+					System.out.println("Do You Wish To Procede? (y/n)");
+					Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
+				}
 			case "5":
 				System.out.println("Thank you for banking with BZ!");
 				running = false;
@@ -231,10 +247,139 @@ public class MenuV1 implements Menu {
 							System.out.println("Invalid Input. Please Enter 1 or 2");
 						}
 					}
-
-				//}catch(BusinessException e) {
-					//System.out.println("Our database is down!");
-//					e.printStackTrace();
+				break;
+			case "2":
+				boolean makeWithdrawal = true;
+				while(makeWithdrawal) {
+					String transType = "Withdrawal";
+					String withdrawalAccount = "";
+					int amount = 0;
+					System.out.println("\nSelect An Account To Withdraw From:");
+					System.out.println("1) Checkings");
+					System.out.println("2) Savings");
+					String acctType = scanner.nextLine();
+					if(acctType.equals("1")) {
+						withdrawalAccount = new String("Checkings");
+						System.out.println("\nAvailable Checkings Balance: " + currentUser.getCheckingBalance());
+						System.out.println("\nPlease Enter Withdraw Amount: ");
+						amount = Integer.parseInt(scanner.nextLine());
+				
+					} else if (acctType.equals("2")){
+						withdrawalAccount = new String("Savings");
+						System.out.println("\nAvailable Savings Balance: " + currentUser.getSavingBalance());
+						System.out.println("\nPlease Enter Withdraw Amount: ");
+						amount = Integer.parseInt(scanner.nextLine());
+					} else {
+						System.out.println("Invalid Input. Please Enter 1 or 2");
+					}
+					//call method to check for valid amount
+					Transaction withdrawal = new Transaction(currentUser.getUserName(), withdrawalAccount, transType, amount);
+					makeWithdrawal = !(service.userWithdrawal(withdrawal));
+				}
+				break;
+			case "3":
+				boolean makeDeposit = true;
+				while(makeDeposit) {
+					String transType = "Deposit";
+					String depositAcct = "";
+					int amount = 0;
+					System.out.println("\nSelect An Account To Deposit To:");
+					System.out.println("1) Checkings");
+					System.out.println("2) Savings");
+					String acctType = scanner.nextLine();
+					if(acctType.equals("1")) {
+						depositAcct = new String("Checkings");
+						System.out.println("\nCurrent Checkings Balance: " + currentUser.getCheckingBalance());
+						System.out.println("\nPlease Enter Deposit Amount: ");
+						amount = Integer.parseInt(scanner.nextLine());
+						System.out.println("Depositing $" +amount);
+				
+					} else if (acctType.equals("2")){
+						depositAcct = new String("Savings");
+						System.out.println("\nCurrent Savings Balance: " + currentUser.getSavingBalance());
+						System.out.println("\nPlease Enter Deposit Amount: ");
+						amount = Integer.parseInt(scanner.nextLine());
+					} else {
+						System.out.println("Invalid Input. Please Enter 1 or 2");
+					}
+					//call method to check for valid amount
+					Transaction deposit = new Transaction(currentUser.getUserName(), depositAcct, transType, amount);
+					makeDeposit = !(service.userDeposit(deposit));
+				}
+				break;
+			case "4":
+				boolean postTransfer = false;
+				while(!postTransfer) {
+					System.out.println("\nPost Money Transfer\n");
+					System.out.println("\nSelect Account To Transfer From");
+					System.out.println("1) Checkings");
+					System.out.println("2) Savings");
+					String selectAcct = scanner.nextLine();
+					if (selectAcct.equals("1")){
+						String sendType = new String("Checkings");
+						System.out.println("\nTransfering From Your Checking Account");
+						System.out.println("Available Balance: " + currentUser.getCheckingBalance());
+						System.out.println("Please Enter The Username That Will Recieve The Transfer:\n");
+						String sendTo = scanner.nextLine();
+						System.out.println("Please Enter The Account Type Of The Reciever (Checkings or Savings):\n");
+						String recType = scanner.nextLine();
+						System.out.println("Please Enter The Amount Being Transfered:\n");
+						int sendAmount = Integer.parseInt(scanner.nextLine());
+						System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
+						System.out.println("Do You Wish To Procede? (y/n)");
+						Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
+						postTransfer = service.postTransfer(userTransfer);
+					} else if (selectAcct.equals("2")){
+						String sendType = new String("Savings");
+						System.out.println("\nTransfering From Your Savings Account");
+						System.out.println("Available Balance: " + currentUser.getSavingBalance());
+						System.out.println("Please Enter The Username That Will Recieve The Transfer:\n");
+						String sendTo = scanner.nextLine();
+						System.out.println("Please Enter The Account Type Of The Reciever (Checkings or Savings):\n");
+						String recType = scanner.nextLine();
+						System.out.println("Please Enter The Amount Being Transfered:\n");
+						int sendAmount = Integer.parseInt(scanner.nextLine());
+						System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
+						System.out.println("Do You Wish To Procede? (y/n)");
+						Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
+						postTransfer = service.postTransfer(userTransfer);
+					}
+					//Note: Clean up this whole part later. Could be simpler but for now it kind of works.	
+				}
+				break;
+			case "5":
+				System.out.println("\nAccept Money Transfer");
+				boolean approveTransfer = true;
+				boolean transferSuccess = false;
+				while(approveTransfer) {
+					System.out.println("\nSearching For Available Transfers...\n");
+					if(service.pendingCount(currentUser.getUserName())){
+						
+						service.displayTransferInfo(currentUser.getUserName());
+						System.out.println("Will You Approve This Transfer? (y/n)");
+						String approving = scanner.nextLine();
+						
+						if(approving.equals("y")) {
+							transferSuccess = service.acceptTransfer(currentUser.getUserName());
+							System.out.println("Transfer Has Been Approved");
+						}else if(approving.equals("n")) {
+							transferSuccess = true;
+							System.out.println("Transfer Has Been Rejected. Funds Will Be Returned To Sender.");
+						}else {
+							System.out.println("An Error Occured During Approval. Please Try Again.");
+							approveTransfer = false;
+						}
+					}else {
+						approveTransfer = false;
+						System.out.println("\nReturning To Customer Menu");
+					}
+					
+					if(transferSuccess){
+						System.out.println("\nSearch For Another Transfer? (y/n)");
+						String approveAnother = scanner.nextLine();
+						approveTransfer = approveAnother.equals("y");
+					}
+				}
 				break;
 			case "7":
 				System.out.println("You have been logged out\nReturning To Main Menu\n");

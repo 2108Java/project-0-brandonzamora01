@@ -50,7 +50,25 @@ public class Transaction {
 		this.transType = transType;
 		this.sentStatus = true;
 	}
-
+	
+	public Transaction(int transId,String destinationName, String destinationType, int transAmount) {
+		//Constructor for posting transfer
+		super();
+		//numberOfTrans ++;
+		this.transId = transId;
+		//this.rootName = rootName;
+		//this.rootType = rootType;
+		this.destinationName = destinationName;
+		this.destinationType = destinationType;
+		this.transAmount = transAmount;
+		this.transType = "Transfer Out";
+		this.sentStatus = false;
+	}
+	
+	public Transaction() {
+		//Default Constructor
+		super();
+	}
 	public int getTransId() {
 		return transId;
 	}

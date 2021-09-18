@@ -1,5 +1,6 @@
 package com.revature.repo;
 
+import com.revature.models.Transaction;
 import com.revature.models.User;
 
 public interface BankAppDAO {
@@ -12,21 +13,24 @@ public interface BankAppDAO {
 	
 	boolean employeeLogin(String name, String pw);
 	
+	Transaction selectPendingTranfer(String recName);
+	
+	int selectPendingCount(String recName);
+	
+	
 	//UPDATE
 	
-	boolean userWithdraw();
+	boolean updateAccountBalance(Transaction arg);
 	
-	boolean userDeposit();
-	
-	boolean customerPostTransfer();
-	
-	boolean customerAcceptTransfer();
+	boolean updateTransferStatus(int transId);
 	
 	//DELETE
 	
 	//INSERT
 	
 	boolean registerAcct(User newUser);
+	
+	boolean insertTransaction(Transaction arg);
 
 	//boolean systemRejectTrans();
 	
