@@ -25,4 +25,8 @@ public interface ServiceBankApp {
 	
 	public void displayTransferInfo(String name);
 	
+	public Transaction[] getTransactionLog(int num);
+	
+	public int getTransactionCount();
+	
 }

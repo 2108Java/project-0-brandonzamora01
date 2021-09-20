@@ -1,5 +1,6 @@
 package com.revature.presentation;
 
+import java.util.Formatter;
 import java.util.Scanner;
 
 //import com.revature.exceptions.BusinessException;
@@ -17,18 +18,18 @@ public class MenuV1 implements Menu {
 		this.service = service;
 	}
 	
-	private void prettyDisplayOfArray(User[] array) {
-		for(int i = 0; i< array.length; i++) {
-					
+	private void prettyDisplayOfTransactions(Transaction[] array) {
+		Formatter fmt = new Formatter();  
+		fmt.format("%10s %10s %15s %10s %20s %10s\n", "Trans ID", "Username", "Account Type", "Amount", "Transaction Type", "Balance"); 
+		for(int i = 0; i< array.length; i++) {	
 			if(array[i] != null) {
-				System.out.println(array[i].getUserName());
-				System.out.println(array[i].getCheckingBalance());
-				System.out.println(array[i].getSavingBalance());
-				System.out.println(array[i].getIsEmployee());
-				System.out.println("");
-			}
-					
+				fmt.format("%10s %10s %15s %10s %20s %10s\n", 
+				array[i].getTransId(),array[i].getRootName(),
+				array[i].getRootType(),array[i].getTransAmount(),
+				array[i].getTransType(),array[i].getEndBal());
+			}		
 		}
+		System.out.println(fmt);  
 	}
 	
 	private void customerMenu() {
@@ -83,6 +84,8 @@ public class MenuV1 implements Menu {
 				String name = scanner.nextLine();
 				System.out.print("Enter Password: ");
 				String pw = scanner.nextLine();
+				
+				System.out.println("Add feature: register for checkings or savings accounts when creating login");
 				
 				if (service.isUserAccount(name, pw)) {
 					currentUser = service.getAcctByName(name);
@@ -174,22 +177,26 @@ public class MenuV1 implements Menu {
 			switch(result){
 			case "1":
 				//User viewUser = new User();
-				
 				System.out.println("\nView Customer Account Balance");
 				System.out.println("\nEnter Customer Name To View Accont Balances:");
 				String findUser = scanner.nextLine();
 				
 				User viewUser = service.getAcctByName(findUser);
 				System.out.println("\nCheckings Balance: " + viewUser.getCheckingBalance());
-				System.out.println("Savings Balance: " + viewUser.getSavingBalance());
-				
-				
+				System.out.println("Savings Balance: " + viewUser.getSavingBalance());	
 				break;
 			case "2":
 				System.out.println("\nApprove Account Registration");
 				break;
 			case "3":
 				System.out.println("\nView Transaction Logs");
+				System.out.println("\nRetrieving Transactions Log...\n");
+				int numberOfTransactions = service.getTransactionCount();
+				if (numberOfTransactions > 0) {
+					prettyDisplayOfTransactions(service.getTransactionLog(numberOfTransactions));
+				} else {
+					System.out.println("Transaction Log Is Empty.");
+				}
 				break;
 			case "4":
 				System.out.println("\nNavigating to Customer Menu");
@@ -201,8 +208,8 @@ public class MenuV1 implements Menu {
 				running = false;
 				break;
 			default:
-				System.out.println("That's not a valid input!");
-				System.out.println("Try again!");
+				System.out.println("That's not a valid input!\nTry again!\n");
+				break;
 			}
 		}
 	}
@@ -254,31 +261,42 @@ public class MenuV1 implements Menu {
 					String transType = "Withdrawal";
 					String withdrawalAccount = "";
 					int amount = 0;
+					boolean tryTrans = false;
 					System.out.println("\nSelect An Account To Withdraw From:");
 					System.out.println("1) Checkings");
 					System.out.println("2) Savings");
+					System.out.println("3) Exit");
 					String acctType = scanner.nextLine();
 					if(acctType.equals("1")) {
 						withdrawalAccount = new String("Checkings");
 						System.out.println("\nAvailable Checkings Balance: " + currentUser.getCheckingBalance());
 						System.out.println("\nPlease Enter Withdraw Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						tryTrans = true;
 				
 					} else if (acctType.equals("2")){
 						withdrawalAccount = new String("Savings");
 						System.out.println("\nAvailable Savings Balance: " + currentUser.getSavingBalance());
 						System.out.println("\nPlease Enter Withdraw Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						tryTrans = true;
+					} else if(acctType.equals("3")){
+						System.out.println("Returning To Previous Menu");
+						makeWithdrawal = false;
 					} else {
-						System.out.println("Invalid Input. Please Enter 1 or 2");
+						System.out.println("Invalid Input. Please Enter 1-3");
 					}
-					//call method to check for valid amount
-					Transaction withdrawal = new Transaction(currentUser.getUserName(), withdrawalAccount, transType, amount);
-					makeWithdrawal = !(service.userWithdrawal(withdrawal));
+					
+					if (tryTrans && makeWithdrawal) {
+						Transaction withdrawal = new Transaction(currentUser.getUserName(), withdrawalAccount, transType, amount);
+						makeWithdrawal = !(service.userWithdrawal(withdrawal));
+					}
 				}
 				break;
 			case "3":
 				boolean makeDeposit = true;
+				boolean tryTrans = false;
+				
 				while(makeDeposit) {
 					String transType = "Deposit";
 					String depositAcct = "";
@@ -286,25 +304,34 @@ public class MenuV1 implements Menu {
 					System.out.println("\nSelect An Account To Deposit To:");
 					System.out.println("1) Checkings");
 					System.out.println("2) Savings");
+					System.out.println("3) Exit");
 					String acctType = scanner.nextLine();
 					if(acctType.equals("1")) {
 						depositAcct = new String("Checkings");
 						System.out.println("\nCurrent Checkings Balance: " + currentUser.getCheckingBalance());
 						System.out.println("\nPlease Enter Deposit Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
-						System.out.println("Depositing $" +amount);
-				
+						tryTrans = true;
 					} else if (acctType.equals("2")){
 						depositAcct = new String("Savings");
 						System.out.println("\nCurrent Savings Balance: " + currentUser.getSavingBalance());
 						System.out.println("\nPlease Enter Deposit Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
-					} else {
-						System.out.println("Invalid Input. Please Enter 1 or 2");
+						tryTrans = true;
+					} else if(acctType.equals("3")){
+						System.out.println("Returning To Previous Menu");
+						tryTrans = true;
+					}else {
+						System.out.println("Invalid Input. Please Enter 1-3");
 					}
-					//call method to check for valid amount
-					Transaction deposit = new Transaction(currentUser.getUserName(), depositAcct, transType, amount);
-					makeDeposit = !(service.userDeposit(deposit));
+					if (tryTrans && (acctType.equals("1") || acctType.equals("2"))) {
+						Transaction deposit = new Transaction(currentUser.getUserName(), depositAcct, transType, amount);
+						tryTrans = service.userDeposit(deposit);
+						if (tryTrans){
+							System.out.println("Depositing "+amount+" To Your "+depositAcct+" Account.");
+						}
+					}
+					makeDeposit = !(tryTrans);
 				}
 				break;
 			case "4":

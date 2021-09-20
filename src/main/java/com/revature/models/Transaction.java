@@ -51,6 +51,23 @@ public class Transaction {
 		this.sentStatus = true;
 	}
 	
+	public Transaction(int transId, String rootName, String rootType, int transAmount, String transType, boolean sentStatus, int startBal, int endBal, String destinationName, String destinationType) {
+		//Constructor for selecting all transactions from database
+		super();
+		//numberOfTrans ++;
+		this.transId = transId;
+		this.rootName = rootName;
+		this.rootType = rootType;
+		this.transType = transType;
+		this.transAmount = transAmount;
+		this.sentStatus = sentStatus;
+		this.startBal = startBal;
+		this.endBal = endBal;
+		this.destinationName = destinationName;
+		this.destinationType = destinationType;
+
+	}
+	
 	public Transaction(int transId,String destinationName, String destinationType, int transAmount) {
 		//Constructor for posting transfer
 		super();

@@ -17,6 +17,9 @@ public interface BankAppDAO {
 	
 	int selectPendingCount(String recName);
 	
+	Transaction[] selectAllTransactions(int numbTrans);
+	
+	public int selectNumTransactions();
 	
 	//UPDATE
 	

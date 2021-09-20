@@ -136,14 +136,16 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		int startBal = 0;
 		boolean updateUserTable = false;
 		boolean updateTransTable = false;
-		if (acctType.equals("Checkings")) { //run if user is depositing to checkings acct
+		boolean validAmount = isValidAmount(arg.getTransAmount()); //check for negative deposit value
+		
+		if (acctType.equals("Checkings") && validAmount) { //run if user is depositing to checkings acct
 			arg.setStartBal(name.getCheckingBalance());//set start balance = to user current balance
 			startBal = arg.getStartBal();
 			endBal = arg.getTransAmount() + startBal; // calc end balance
 			arg.setEndBal(endBal); // set new balance
 			updateTransTable = database.insertTransaction(arg);//add deposit data to transactions table	
 			updateUserTable = database.updateAccountBalance(arg);//update user's balance in SQL database with new value
-		}else if (acctType.equals("Savings")) { // run if user is depositing to savings acct
+		}else if (acctType.equals("Savings") && validAmount) { // run if user is depositing to savings acct
 			arg.setStartBal(name.getSavingBalance());
 			startBal = arg.getStartBal();
 			endBal = arg.getTransAmount() + startBal;
@@ -153,8 +155,11 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		}else {
 			System.out.println("An Error Has Occured!");
 		}
+		
 		success = (updateUserTable && updateTransTable);
-		System.out.println("Deposit Successful!");
+		if (success) {
+			System.out.println("Deposit Successful!");
+		}
 		return success;
 	}
 
@@ -162,31 +167,32 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 	public boolean userWithdrawal(Transaction arg) {
 		//Using a Transaction object, the method return a boolean representing the success of the operation.
 		boolean success = false;
-		User name = getAcctByName(arg.getRootName()); //get username to determine start/end balance
-		String acctType = arg.getRootType(); // determine which account the user is withdrawing from 
+		User name = getAcctByName(arg.getRootName());					 //get username to determine start/end balance
+		String acctType = arg.getRootType(); 							// determine which account the user is withdrawing from 
 		int endBal = 0;
 		int startBal = 0;
 		boolean updateUserTable = false;
 		boolean updateTransTable = false;
-		if (acctType.equals("Checkings")) { //run if user is depositing to checkings acct
-			arg.setStartBal(name.getCheckingBalance());//set start balance = to user current balance
-			startBal = arg.getStartBal();
-			endBal = startBal - arg.getTransAmount(); // calc end balance
-			arg.setEndBal(endBal); // set new balance
-			updateTransTable = database.insertTransaction(arg);//add deposit data to transactions table	
-			updateUserTable = database.updateAccountBalance(arg);//update user's balance in SQL database with new value
-		}else if (acctType.equals("Savings")) { // run if user is depositing to savings acct
-			arg.setStartBal(name.getSavingBalance());
-			startBal = arg.getStartBal();
-			endBal = startBal - arg.getTransAmount();
-			arg.setEndBal(endBal);
-			updateTransTable = database.insertTransaction(arg);
-			updateUserTable = database.updateAccountBalance(arg); 
-		}else {
-			System.out.println("An Error Has Occured!");
+		if (isValidAmount(arg.getTransAmount())) {						//check for valid withdraw amount (no negative numbers)
+			if (acctType.equals("Checkings")) { 						//run if user is depositing to checkings acct
+				startBal = name.getCheckingBalance();					//get start balance from users current balance
+			}else if(acctType.equals("Savings")) {						//run if user is depositing to savings acct
+				startBal = name.getSavingBalance();
+			}else {
+				System.out.println("An Error Occured. Unable To Get Starting Balance. Withdraw Cancelled.");
+			}
+			if (isValidWithdrawal(arg.getTransAmount(), startBal)) {	//check to see if withdraw amount is more than current balance
+				arg.setStartBal(startBal);								//set start 
+				endBal = startBal - arg.getTransAmount();				//calc end balance
+				arg.setEndBal(endBal);									//set end balance
+				updateTransTable = database.insertTransaction(arg);		//add deposit data to transactions table	
+				updateUserTable = database.updateAccountBalance(arg);	//update user's balance in SQL database with new value
+			}
 		}
-		success = (updateUserTable && updateTransTable);
-		System.out.println("Withdraw Successful!");
+		success = (updateUserTable && updateTransTable);				//return successful if the transaction can process and if tables are updated. 
+		if (success) {
+			System.out.println("Withdraw Successful!");
+		}
 		return success;
 	}
 	
@@ -227,5 +233,16 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		
 		System.out.println(senderName+" Would Like To Send "+ transAmount+ " To Your "+ depAcctType +" Account");
 	}
+	
+	public Transaction[] getTransactionLog(int num) {
+		return database.selectAllTransactions(num);
+	}
+	
+	public int getTransactionCount() { 
+	 return database.selectNumTransactions();
+	}
 }
+
+
+
 

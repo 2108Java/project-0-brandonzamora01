@@ -296,4 +296,53 @@ public class BankAppDAOImpl implements BankAppDAO {
 		}
 		return pendingCount;
 	}
+	
+	public Transaction[] selectAllTransactions(int numbTrans) {
+		
+		Transaction[] allTransactions = new Transaction[numbTrans];
+		
+		try(Connection connection = DriverManager.getConnection(url, username, password)){
+		
+			String sql = "SELECT * FROM all_transactions_table ORDER BY trans_id;";
+		
+			PreparedStatement ps = connection.prepareStatement(sql);
+		
+			ResultSet rs = ps.executeQuery();
+		
+			int i = 0;
+			while(rs.next()) {
+			
+				allTransactions[i] = new Transaction(rs.getInt("trans_id"),rs.getString("username"), 
+						rs.getString("acct_type"),rs.getInt("trans_amount"),rs.getString("trans_type"),rs.getBoolean("approve_status"),
+						rs.getInt("acct_start_balance"), rs.getInt("acct_end_balance"),rs.getString("destination_name"),rs.getString("destination_type"));
+				i++;
+			
+			}
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return allTransactions;
+	}
+	
+	public int selectNumTransactions(){
+		int numberTrans = 0;
+		try(Connection connection = DriverManager.getConnection(url, username, password)){
+			
+			String sql = "SELECT COUNT(*) FROM all_transactions_table";
+		
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			
+			numberTrans = rs.getInt("count");
+			
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return numberTrans;
+	}
 }
