@@ -21,11 +21,21 @@ public interface BankAppDAO {
 	
 	public int selectNumTransactions();
 	
+	public String[] selectUnapprovedCustomer(int num);
+	
+	public int selectUnapprovedNum();
+	
 	//UPDATE
 	
 	boolean updateAccountBalance(Transaction arg);
 	
 	boolean updateTransferStatus(int transId);
+	
+	boolean updateUserAccess(String name);
+	
+	boolean updateCheckingStatus(String name);
+	
+	boolean updateSavingStatus(String name);
 	
 	//DELETE
 	

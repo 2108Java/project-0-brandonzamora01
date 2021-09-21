@@ -13,6 +13,12 @@ public interface ServiceBankApp {
 
 	public boolean createAcct(User currentUser);
 	
+	public boolean createCheckingAcct(String name);
+	
+	public boolean createSavingAcct(String name);
+	
+	public boolean approveUserAccess(String name);
+	
 	public boolean postTransfer(Transaction arg);
 	
 	public boolean acceptTransfer(String recName);
@@ -28,5 +34,11 @@ public interface ServiceBankApp {
 	public Transaction[] getTransactionLog(int num);
 	
 	public int getTransactionCount();
+	
+	public int getUnapprovedCount();
+	
+	public String[] getUnapprovedList(int num);
+	
+	public boolean isValidAmount(int amount);
 	
 }

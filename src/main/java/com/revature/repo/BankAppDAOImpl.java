@@ -25,7 +25,7 @@ public class BankAppDAOImpl implements BankAppDAO {
 				
 			//2. Write a SQL statement String
 				
-			String sql = "INSERT INTO all_users_table VALUES (?,?,?,?,?,?)";
+			String sql = "INSERT INTO all_users_table VALUES (?,?,?,?,?,?,?,?)";
 				
 			PreparedStatement ps = connection.prepareStatement(sql);
 				
@@ -35,6 +35,8 @@ public class BankAppDAOImpl implements BankAppDAO {
 			ps.setInt(4, newUser.getSavingBalance());
 			ps.setBoolean(5, newUser.getIsApproved());
 			ps.setBoolean(6, newUser.getIsEmployee());
+			ps.setBoolean(7, newUser.isCreateChecking());
+			ps.setBoolean(8, newUser.isCreateSaving());
 				
 			ps.execute();
 				
@@ -119,6 +121,8 @@ public class BankAppDAOImpl implements BankAppDAO {
 			acct.setSavingBalance(rs.getInt("savingbalance"));
 			acct.setIsApproved(rs.getBoolean("isapproved"));	
 			acct.setIsEmployee(rs.getBoolean("isemployed"));
+			acct.setCreateChecking(rs.getBoolean("create_checking"));	
+			acct.setCreateSaving(rs.getBoolean("create_saving"));
 											
 			connection.close();
 		} catch (SQLException e) {
@@ -344,5 +348,133 @@ public class BankAppDAOImpl implements BankAppDAO {
 			e.printStackTrace();
 		}
 		return numberTrans;
+	}
+
+	@Override
+	public int selectUnapprovedNum() {
+		// TODO Auto-generated method stub
+		int numberUnapproved = 0;
+		
+		try(Connection connection = DriverManager.getConnection(url, username, password)){
+			
+			String sql = "SELECT COUNT(*) FROM all_users_table WHERE isapproved = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setBoolean(1, false);
+			
+			ResultSet rs = ps.executeQuery();
+			rs.next();
+			
+			numberUnapproved = rs.getInt("count");
+			
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return numberUnapproved;
+	}
+		
+
+	@Override
+	public String[] selectUnapprovedCustomer(int num) {
+		// TODO Auto-generated method stub
+		String[] listUnapproved = new String[num];
+		
+		try(Connection connection = DriverManager.getConnection(url, username, password)){
+			
+			String sql = "SELECT * FROM all_users_table WHERE isapproved = ?";
+			
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setBoolean(1, false);
+			
+			ResultSet rs = ps.executeQuery();
+			int i = 0;
+			while(rs.next()) {
+				listUnapproved[i] = rs.getString("username");
+				i++;
+			}
+			
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return listUnapproved;
+	}
+
+	@Override
+	public boolean updateUserAccess(String name) {
+		// TODO Auto-generated method stub
+		boolean success = false;
+		//1. Connect to database!
+		try(Connection connection = DriverManager.getConnection(url,username,password)){
+				//2. Write a SQL statement String
+			String sql = "UPDATE all_users_table SET isapproved = ? WHERE username = ?";
+				
+			PreparedStatement ps = connection.prepareStatement(sql);
+				
+			ps.setBoolean(1, true);
+			ps.setString(2, name);
+			ps.execute();
+			
+			success = true;
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+	return success;
+	}
+
+	@Override
+	public boolean updateCheckingStatus(String name) {
+		// TODO Auto-generated method stub
+		boolean success = false;
+		//1. Connect to database!
+		try(Connection connection = DriverManager.getConnection(url,username,password)){
+				//2. Write a SQL statement String
+			String sql = "UPDATE all_users_table SET create_checking = ? WHERE username = ?";
+				
+			PreparedStatement ps = connection.prepareStatement(sql);
+				
+			ps.setBoolean(1, true);
+			ps.setString(2, name);
+			ps.execute();
+			
+			success = true;
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		return success;
+	}
+
+	@Override
+	public boolean updateSavingStatus(String name) {
+		// TODO Auto-generated method stub
+		boolean success = false;
+		//1. Connect to database!
+		try(Connection connection = DriverManager.getConnection(url,username,password)){
+				//2. Write a SQL statement String
+			String sql = "UPDATE all_users_table SET create_saving = ? WHERE username = ?";
+				
+			PreparedStatement ps = connection.prepareStatement(sql);
+				
+			ps.setBoolean(1, true);
+			ps.setString(2, name);
+			ps.execute();
+			
+			success = true;
+			connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		return success;
 	}
 }

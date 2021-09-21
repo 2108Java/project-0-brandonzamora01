@@ -195,7 +195,7 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		}
 		return success;
 	}
-	
+
 	public boolean isValidAmount(int amount) {
 		boolean valid = false;
 		if (amount > 0) {
@@ -240,6 +240,31 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 	
 	public int getTransactionCount() { 
 	 return database.selectNumTransactions();
+	}
+	@Override
+	public int getUnapprovedCount() {
+		// TODO Auto-generated method stub
+		return database.selectUnapprovedNum();
+	}
+	@Override
+	public String[] getUnapprovedList(int num) {
+		// TODO Auto-generated method stub
+		return database.selectUnapprovedCustomer(num);
+	}
+	@Override
+	public boolean approveUserAccess(String name) {
+		// TODO Auto-generated method stub
+		return database.updateUserAccess(name);
+	}
+	@Override
+	public boolean createCheckingAcct(String name) {
+		// TODO Auto-generated method stub
+		return database.updateCheckingStatus(name);
+	}
+	@Override
+	public boolean createSavingAcct(String name) {
+		// TODO Auto-generated method stub
+		return database.updateSavingStatus(name);
 	}
 }
 

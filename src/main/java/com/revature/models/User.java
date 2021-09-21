@@ -8,8 +8,10 @@ public class User {
 	private String passWord;
 	private boolean isApproved;
 	private boolean isEmployee;
+	private boolean createChecking;
+	private boolean createSaving;
 	
-	
+
 	public User(String userName, String passWord, int checkingBalance, int savingBalance, boolean isApproved, boolean isEmployee) {
 		super();
 		this.userName = userName;
@@ -84,5 +86,32 @@ public class User {
 	public void setSavingBalance(int savingBalance) {
 		this.savingBalance = savingBalance;
 	}
-	
+	public boolean isCreateChecking() {
+		return createChecking;
+	}
+
+	public void setCreateChecking(boolean createChecking) {
+		this.createChecking = createChecking;
+	}
+
+	public boolean isCreateSaving() {
+		return createSaving;
+	}
+
+	public void setCreateSaving(boolean createSaving) {
+		this.createSaving = createSaving;
+	}
+
+	public String getPassWord() {
+		return passWord;
+	}
+
+	public void setApproved(boolean isApproved) {
+		this.isApproved = isApproved;
+	}
+
+	public void setEmployee(boolean isEmployee) {
+		this.isEmployee = isEmployee;
+	}
+
 }
