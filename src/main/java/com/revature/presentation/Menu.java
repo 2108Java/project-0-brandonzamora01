@@ -4,10 +4,10 @@ import com.revature.models.User;
 
 public interface Menu {
 	
-	public void employeeDisplay();
+	public void employeeDisplay(User currentUser);
 
 	public void defaultDisplay();
 
-	void customerDisplay();
+	public void customerDisplay(User currentUser);
 	
 }

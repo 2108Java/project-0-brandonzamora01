@@ -40,5 +40,7 @@ public interface ServiceBankApp {
 	public String[] getUnapprovedList(int num);
 	
 	public boolean isValidAmount(int amount);
+
+	public boolean isValidWithdrawal(int amount, int balance);
 	
 }

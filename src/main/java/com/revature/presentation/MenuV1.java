@@ -3,6 +3,9 @@ package com.revature.presentation;
 import java.util.Formatter;
 import java.util.Scanner;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 //import com.revature.exceptions.BusinessException;
 import com.revature.service.ServiceBankApp;
 import com.revature.models.Transaction;
@@ -12,7 +15,8 @@ public class MenuV1 implements Menu {
 	
 	ServiceBankApp service;
 	
-	User currentUser = new User();
+	private static final Logger loggy = Logger.getLogger(Menu.class);
+	//User currentUser = new User();
 	
 	public MenuV1(ServiceBankApp service) {
 		this.service = service;
@@ -32,7 +36,7 @@ public class MenuV1 implements Menu {
 		System.out.println(fmt);  
 	}
 	
-	private void customerMenu() {
+	private void customerMenu(User currentUser) {
 		System.out.println("\n***CUSTOMER MENU***\n");
 		System.out.println("Logged in as " + currentUser.getUserName());
 		System.out.println("\n1) View Account Balance");
@@ -45,7 +49,7 @@ public class MenuV1 implements Menu {
 		System.out.println("8) Logout\n");
 	}
 	
-	private void employeeMenu() {
+	private void employeeMenu(User currentUser) {
 		System.out.println("\n***EMPLOYEE MENU***\n");
 		System.out.println("Logged in as "+ currentUser.getUserName());
 		System.out.println("\n1) View Customer Account Balance");
@@ -66,27 +70,31 @@ public class MenuV1 implements Menu {
 	
 	
 	public void defaultDisplay() {
+		loggy.setLevel(Level.ALL);
+		
 		System.out.println("");
 		
 		Scanner scanner = new Scanner(System.in);
 		boolean running = true;
+		User currentUser = new User();
 		
 		while (running) {
 			//call default menu to display
 			defaultMenu();
 			String result = scanner.nextLine();
-			
+			loggy.info("User put in the option :" + result);
 			switch(result){
 			case "1":
 				System.out.println("\nLogin as Customer");
 				System.out.print("\nEnter Username: ");
 				String name = scanner.nextLine();
+				loggy.info("User put in Username:" + name);
 				System.out.print("Enter Password: ");
 				String pw = scanner.nextLine();
-				
+				loggy.info("User put in Password :" + pw);
 				if (service.isUserAccount(name, pw)) {
 					currentUser = service.getAcctByName(name);
-					customerDisplay();
+					customerDisplay(currentUser);
 				}else {
 					System.out.println("Login Has Failed");
 				}
@@ -95,12 +103,14 @@ public class MenuV1 implements Menu {
 				System.out.println("\nLogin as Employee");
 				System.out.print("\nEnter Username: ");
 				String employeeName = scanner.nextLine();
+				loggy.info("Employee put in Username :" + employeeName);
 				System.out.print("Enter Password: ");
 				String employeePw = scanner.nextLine();
+				loggy.info("Employee put in Passwrord:" + employeePw);
 				
 				if (service.isEmployeeAccount(employeeName, employeePw)) {
 					currentUser = service.getAcctByName(employeeName);
-					employeeDisplay();
+					employeeDisplay(currentUser);
 					}else {
 						System.out.println("Current User Is Not An Authorized Employee");
 					}
@@ -114,9 +124,10 @@ public class MenuV1 implements Menu {
 				System.out.println("4) Exit");
 				
 				String option = scanner.nextLine();
+				loggy.info("User put in the option :" + option);
 				boolean validOption = false;
 				boolean match = false;
-				
+				currentUser.setIsApproved(false);
 				switch(option){
 				case "1":
 					currentUser.setCreateChecking(true);
@@ -147,44 +158,31 @@ public class MenuV1 implements Menu {
 					for (int i = 0; i <= 3; i++) {
 						System.out.print("Enter Username: ");
 						String newName = scanner.nextLine();
+						loggy.info("User put in the option :" + newName);
 						System.out.print("Enter Password: ");
 						String newPw = scanner.nextLine();
+						loggy.info("User put in the option :" + newPw);
 						System.out.print("Confirm Password: ");
 						String confirmPw = scanner.nextLine();
+						loggy.info("User put in the option :" + confirmPw);
 						match = newPw.equals(confirmPw);
 
 						if (match) {
 							currentUser.setUserName(newName);
 							currentUser.setPassWord(newPw);
 							service.createAcct(currentUser);
+							loggy.info("Username and Paswword Match. Account Has Been Created.");
 							i = 3;
 						}else {
 							System.out.println("\nPassword Does Not Match. Try Again");
 						}
 					}	
-					System.out.println("\nAccount Creation Successful. Please Login to Access Features");
+					System.out.println("\nAccount Creation Successful. Please Login to Access Features\n");
 				}
 					break;
 			case "4":
-				System.out.println("\nPost Money Transfer\n");
-				System.out.println("Select Account To Transfer From");
-				System.out.println("1) Checkings");
-				System.out.println("2) Savings");
-				String selectAcct = scanner.nextLine();
-				if (selectAcct.equals("1")){
-					String sendType = new String("checking");
-					System.out.println("\nTransfering From Your Checking Account");
-					System.out.println("Available Balance: " + currentUser.getCheckingBalance());
-					System.out.println("Please Enter The Username The Will Recieve The Transfer:\n");
-					String sendTo = scanner.nextLine();
-					System.out.println("Please Enter The Account Type Of The Reciever (checkings or savings):\n");
-					String recType = scanner.nextLine();
-					System.out.println("Please Enter The Amount Being Transfered:\n");
-					int sendAmount = Integer.parseInt(scanner.nextLine());
-					System.out.println("\nSummary: Sending $"+sendAmount+"To "+sendTo+"'s"+recType+" Account.");
-					System.out.println("Do You Wish To Procede? (y/n)");
-					Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
-				}
+				System.out.println("\nFeature Has Not Been Setup Yet.\n");
+				break;
 			case "5":
 				System.out.println("Thank you for banking with BZ!");
 				running = false;
@@ -194,23 +192,24 @@ public class MenuV1 implements Menu {
 		}
 	}
 	
-	public void employeeDisplay() {
+	public void employeeDisplay(User currentUser) {
 		
 		Scanner scanner = new Scanner(System.in);
 		boolean running = true;
 		
 		while (running) {
 			//call default menu to display
-			employeeMenu();
+			employeeMenu(currentUser);
 			
 			String result = scanner.nextLine();
-			
+			loggy.info("Employee put in the option :" + result);
 			switch(result){
 			case "1":
 				//User viewUser = new User();
 				System.out.println("\nView Customer Account Balance");
 				System.out.println("\nEnter Customer Name To View Accont Balances:");
 				String findUser = scanner.nextLine();
+				loggy.info("Employee searched User Balance" + findUser);
 				
 				User viewUser = service.getAcctByName(findUser);
 				System.out.println("\nCheckings Balance: " + viewUser.getCheckingBalance());
@@ -234,8 +233,9 @@ public class MenuV1 implements Menu {
 					
 					System.out.println("\nEnter A User To Approve Online Access.");
 					String approveUser = scanner.nextLine();
-					
+					loggy.info("Employee Tried To Approve User" + approveUser);
 					if(service.approveUserAccess(approveUser)){
+						loggy.info("User Approved" + approveUser);
 						System.out.println("\nUser Access Has Been Approved.");
 						System.out.println("Would You Like To Approve Another User? (y/n)");
 						String approveAnother = scanner.nextLine();
@@ -253,6 +253,7 @@ public class MenuV1 implements Menu {
 				System.out.println("\nRetrieving Transactions Log...\n");
 				int numberOfTransactions = service.getTransactionCount();
 				if (numberOfTransactions > 0) {
+					loggy.info("Employee Viewed Transaction List");
 					prettyDisplayOfTransactions(service.getTransactionLog(numberOfTransactions));
 				} else {
 					System.out.println("Transaction Log Is Empty.");
@@ -260,11 +261,13 @@ public class MenuV1 implements Menu {
 				break;
 			case "4":
 				System.out.println("\nNavigating to Customer Menu");
-				customerDisplay();
+				loggy.info("Employee Navigated To Customer Menu");
+				customerDisplay(currentUser);
 				running = false;
 				break;
 			case "5":
 				System.out.println("You have been logged out\nReturning To Main Menu\n");
+				loggy.info("Employee Has Logged Out");
 				running = false;
 				break;
 			default:
@@ -275,8 +278,9 @@ public class MenuV1 implements Menu {
 	}
 	
 	@Override
-	public void customerDisplay(){
+	public void customerDisplay(User currentUser){
 		// TODO Auto-generated method stub
+		loggy.info("Customer logged in as:" + currentUser.getUserName());
 		Scanner scanner = new Scanner(System.in);
 		boolean featureAccess = currentUser.getIsApproved();		// Has account been approved for access by bank employee
 		boolean checkingAccess = currentUser.isCreateChecking();	// Does User have a cheking account?
@@ -284,20 +288,21 @@ public class MenuV1 implements Menu {
 		
 		boolean running = featureAccess;
 		if (!running) {
-			System.out.println("\nAccount Features Have Not Been Enabled Yet.\nPlease Contact Bank Employee To Approve User Account.\n");
+			System.out.println("\nAccount Features Have Not Been Enabled Yet.\nPlease Contact Bank Employee To Approve User Account.\n\nLogging User Out\n");
 		}
 		while(running){
 			
-			customerMenu();
+			customerMenu(currentUser);
 			
 			String result = scanner.nextLine();
-			
+			loggy.info("Customer has put in the option :" + result);			
 			switch(result){
 			case "1":
 
 				boolean viewBal = true;
 
 				while(viewBal) {
+					currentUser = service.getAcctByName(currentUser.getUserName());
 					System.out.println("\nSelect An Account To View:");
 					System.out.println("1) Checkings");
 					System.out.println("2) Savings");
@@ -305,6 +310,7 @@ public class MenuV1 implements Menu {
 					String acctType = scanner.nextLine();
 					if(acctType.equals("1")) {
 						if(checkingAccess) {
+							loggy.info("Customer Viewing Checking Balance");	
 							System.out.println("\nCheckings Balance: " + currentUser.getCheckingBalance());
 							System.out.println("\nWould You Like To View Another Account? (y/n)");
 							String viewAnother = scanner.nextLine();
@@ -317,6 +323,7 @@ public class MenuV1 implements Menu {
 						}
 					} else if (acctType.equals("2")){
 						if(savingAccess) {
+							loggy.info("Customer Viewing Saving Balance");	
 							System.out.println("Savings Balance: " + currentUser.getSavingBalance());
 							System.out.println("\nWould You Like To View Another Account? (y/n)");
 							String viewAnother = scanner.nextLine();
@@ -352,6 +359,7 @@ public class MenuV1 implements Menu {
 						System.out.println("\nAvailable Checkings Balance: " + currentUser.getCheckingBalance());
 						System.out.println("\nPlease Enter Withdraw Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						loggy.info("Customer Attempting To Withdraw "+amount+" From Checking");	
 						tryTrans = true;
 				
 					} else if (acctType.equals("2")){
@@ -359,6 +367,7 @@ public class MenuV1 implements Menu {
 						System.out.println("\nAvailable Savings Balance: " + currentUser.getSavingBalance());
 						System.out.println("\nPlease Enter Withdraw Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						loggy.info("Customer Attempting To Withdraw "+amount+" From Checking");	
 						tryTrans = true;
 					} else if(acctType.equals("3")){
 						System.out.println("Returning To Previous Menu");
@@ -369,6 +378,7 @@ public class MenuV1 implements Menu {
 					
 					if (tryTrans && makeWithdrawal) {
 						Transaction withdrawal = new Transaction(currentUser.getUserName(), withdrawalAccount, transType, amount);
+						loggy.info("Customer Successful Withdraw Of $ "+amount+" From "+ withdrawalAccount);	
 						makeWithdrawal = !(service.userWithdrawal(withdrawal));
 					}
 				}
@@ -391,12 +401,14 @@ public class MenuV1 implements Menu {
 						System.out.println("\nCurrent Checkings Balance: " + currentUser.getCheckingBalance());
 						System.out.println("\nPlease Enter Deposit Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						loggy.info("Customer Attempting To Deposit "+amount+" To Checking");	
 						tryTrans = true;
 					} else if (acctType.equals("2")){
 						depositAcct = new String("Savings");
 						System.out.println("\nCurrent Savings Balance: " + currentUser.getSavingBalance());
 						System.out.println("\nPlease Enter Deposit Amount: ");
 						amount = Integer.parseInt(scanner.nextLine());
+						loggy.info("Customer Attempting To Deposit "+amount+" To Savings");
 						tryTrans = true;
 					} else if(acctType.equals("3")){
 						System.out.println("Returning To Previous Menu");
@@ -409,6 +421,7 @@ public class MenuV1 implements Menu {
 						tryTrans = service.userDeposit(deposit);
 						if (tryTrans){
 							System.out.println("Depositing "+amount+" To Your "+depositAcct+" Account.");
+							loggy.info("Customer Successful Deposit Of $ "+amount+" To "+ depositAcct);	
 						}
 					}
 					makeDeposit = !(tryTrans);
@@ -429,6 +442,7 @@ public class MenuV1 implements Menu {
 						System.out.println("Available Balance: " + currentUser.getCheckingBalance());
 						System.out.println("Please Enter The Username That Will Recieve The Transfer:\n");
 						String sendTo = scanner.nextLine();
+						//Check for valid user
 						System.out.println("Please Enter The Account Type Of The Reciever (Checkings or Savings):\n");
 						System.out.println("1) Checkings");
 						System.out.println("2) Savings");
@@ -437,30 +451,53 @@ public class MenuV1 implements Menu {
 							recType = "Checkings";
 						}else if (recType.equals("2")) {
 							recType = "Savings";
-						}else {
+						}
+						if (recType.equals("Checkings")||recType.equals("Savings")) {
+							System.out.println("Please Enter The Amount Being Transfered:\n");
+							int sendAmount = Integer.parseInt(scanner.nextLine());
+							System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
+							System.out.println("Do You Wish To Procede? (y/n)");
+							String proceed = scanner.nextLine();
+							if (proceed.equals("y")) {
+								Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
+								postTransfer = service.postTransfer(userTransfer);
+								System.out.println("Returning To Customer Menu");
+								loggy.info("Customer Successful Post Transfer Of $ "+sendAmount+" To "+sendTo+"'s "+recType+" Account");	
+							}
+						} else {
 							System.out.println("An Error Occured. Please Enter 1 or 2. Try Again");
 						}
-						System.out.println("Please Enter The Amount Being Transfered:\n");
-						int sendAmount = Integer.parseInt(scanner.nextLine());
-						System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
-						System.out.println("Do You Wish To Procede? (y/n)");
-						Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
-						postTransfer = service.postTransfer(userTransfer);
 					} else if (selectAcct.equals("2")){
 						String sendType = new String("Savings");
 						System.out.println("\nTransfering From Your Savings Account");
 						System.out.println("Available Balance: " + currentUser.getSavingBalance());
 						System.out.println("Please Enter The Username That Will Recieve The Transfer:\n");
 						String sendTo = scanner.nextLine();
+						//Check for valid user
 						System.out.println("Please Enter The Account Type Of The Reciever (Checkings or Savings):\n");
+						System.out.println("1) Checkings");
+						System.out.println("2) Savings");
 						String recType = scanner.nextLine();
-						System.out.println("Please Enter The Amount Being Transfered:\n");
-						int sendAmount = Integer.parseInt(scanner.nextLine());
-						System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
-						System.out.println("Do You Wish To Procede? (y/n)");
-						Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
-						postTransfer = service.postTransfer(userTransfer);
-						//Note: Clean up this whole part later. Could be simpler but for now it kind of works.	
+						if (recType.equals("1")) {
+							recType = "Checkings";
+						}else if (recType.equals("2")) {
+							recType = "Savings";
+						}
+						if (recType.equals("Checkings")||recType.equals("Savings")) {
+							System.out.println("Please Enter The Amount Being Transfered:\n");
+							int sendAmount = Integer.parseInt(scanner.nextLine());
+							System.out.println("\nSummary: Sending $"+sendAmount+" To "+sendTo+"'s "+recType+" Account.");
+							System.out.println("Do You Wish To Procede? (y/n)");
+							String proceed = scanner.nextLine();
+							if (proceed.equals("y")) {
+								Transaction userTransfer = new Transaction (currentUser.getUserName(), sendType, sendTo, recType, sendAmount);
+								postTransfer = service.postTransfer(userTransfer);
+								System.out.println("Returning To Customer Menu");
+								loggy.info("Customer Successful Post Transfer Of $ "+sendAmount+" To "+sendTo+"'s "+recType+" Account");
+							}
+						} else {
+							System.out.println("An Error Occured. Please Enter 1 or 2. Try Again");
+						}
 					} else if (selectAcct.equals("3")){
 						System.out.println("\nExiting The Transfer Menu");
 						postTransfer = true;
@@ -477,15 +514,17 @@ public class MenuV1 implements Menu {
 				while(approveTransfer) {
 					System.out.println("\nSearching For Available Transfers...");
 					if(service.pendingCount(currentUser.getUserName())){
-						
+						loggy.info("Customer Searching For Pending Inbound Transfers");
 						service.displayTransferInfo(currentUser.getUserName());
 						System.out.println("\nWill You Approve This Transfer? (y/n)");
 						String approving = scanner.nextLine();
 						
 						if(approving.equals("y")) {
+							loggy.info("Customer Approved Pending Transfer");
 							transferSuccess = service.acceptTransfer(currentUser.getUserName());
 						}else if(approving.equals("n")) {
 							transferSuccess = true;
+							loggy.info("Customer Denied Pending Transfer");
 							System.out.println("Transfer Has Been Rejected. Funds Will Be Returned To Sender.");
 						}else {
 							System.out.println("An Error Occured During Approval. Please Try Again.");
@@ -497,7 +536,6 @@ public class MenuV1 implements Menu {
 					}
 					
 					if(transferSuccess){
-						System.out.println("Transfer Has Been Approved");
 						System.out.println("\nSearch For Another Transfer? (y/n)");
 						String approveAnother = scanner.nextLine();
 						approveTransfer = approveAnother.equals("y");
@@ -510,8 +548,10 @@ public class MenuV1 implements Menu {
 					System.out.println("Would You Like To Create A Checkings Account? (y/n)");
 					String applyChecking = scanner.nextLine();
 					if (applyChecking.equals("y")) {
+						loggy.info("Customer Trying To Create Checking Account");
 						boolean createChecking = service.createCheckingAcct(currentUser.getUserName());
 						System.out.println("\nAccount Has Been Initialized");
+						loggy.info("Customer Checking Account Has Been Initialzed");
 						System.out.println("Would You Like Make An Initial Deposit? (y/n)");
 						String makeCheckingDep = scanner.nextLine();
 						if (makeCheckingDep.equals("y")) {
@@ -523,6 +563,8 @@ public class MenuV1 implements Menu {
 								tryCheckingDep = service.userDeposit(newChecking);
 								if (tryCheckingDep){
 									System.out.println("Depositing "+intDepAmount+" To Your Checkings Account.");
+									loggy.info("Customer Has Made An Initial Deposit Of "+intDepAmount+" To Their Chekcking Account");
+									System.out.println("\nReturning To Customer Menu...\n");
 								}
 							}
 						}else {
@@ -538,11 +580,13 @@ public class MenuV1 implements Menu {
 			case "7":
 				System.out.println("\nApply For A Savings Account\n");
 				if (!savingAccess) {
-					System.out.println("Would You Like To Create A Checkings Account? (y/n)");
+					System.out.println("Would You Like To Create A Savings Account? (y/n)");
 					String applySaving = scanner.nextLine();
 					if (applySaving.equals("y")) {
+						loggy.info("Customer Trying To Create Savings Account");
 						boolean createSaving = service.createSavingAcct(currentUser.getUserName());
 						System.out.println("\nAccount Has Been Initialized");
+						loggy.info("Customer Saving Account Has Been Initialzed");
 						System.out.println("Would You Like Make An Initial Deposit? (y/n)");
 						String makeSavingDep = scanner.nextLine();
 						if (makeSavingDep.equals("y")) {
@@ -554,6 +598,8 @@ public class MenuV1 implements Menu {
 								trySavingDep = service.userDeposit(newSaving);
 								if (trySavingDep){
 									System.out.println("Depositing "+intDepAmount+" To Your Savings Account.");
+									loggy.info("Customer Has Made An Initial Deposit Of "+intDepAmount+" To Their Savings Account");
+									System.out.println("\nReturning To Customer Menu...\n");
 								}
 							}
 						}else {

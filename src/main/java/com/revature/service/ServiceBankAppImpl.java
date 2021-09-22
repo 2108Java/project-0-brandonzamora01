@@ -67,7 +67,7 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 			System.out.println("An Error Has Occured!");
 		}
 		success = (updateUserTable && updateTransTable);
-		System.out.println("Amount Has Been Withdrawn From Your Account. The Reciever Will Now Have To Accept The Transfer.");
+		System.out.println("\nAmount Has Been Withdrawn From Your Account. The Reciever Will Now Have To Accept The Transfer.");
 		return success;
 	}
 
@@ -206,9 +206,10 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		return valid;
 	}
 	
+	@Override
 	public boolean isValidWithdrawal(int amount, int balance) {
 		boolean valid = false;
-		if (amount < balance) {
+		if (amount <= balance) {
 			valid = true;
 		}else {
 			System.out.println("You Cannot Withdraw More Than The Current Balance. Please Try Again");
@@ -231,7 +232,7 @@ public class ServiceBankAppImpl implements ServiceBankApp{
 		String depAcctType = displayTransfer.getDestinationType();			
 		String senderName = displayTransfer.getRootName();
 		
-		System.out.println(senderName+" Would Like To Send "+ transAmount+ " To Your "+ depAcctType +" Account");
+		System.out.println(senderName+" Would Like To Send $"+ transAmount+ " To Your "+ depAcctType +" Account.");
 	}
 	
 	public Transaction[] getTransactionLog(int num) {

@@ -44,7 +44,5 @@ public interface BankAppDAO {
 	boolean registerAcct(User newUser);
 	
 	boolean insertTransaction(Transaction arg);
-
-	//boolean systemRejectTrans();
 	
 }
